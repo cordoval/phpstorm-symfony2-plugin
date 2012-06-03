@@ -21,11 +21,11 @@ public class Argument {
         this.value = value;
     }
 
-    public Boolean getService() {
+    public Boolean isService() {
         return isService;
     }
 
-    public void setService(Boolean service) {
+    public void isService(Boolean service) {
         isService = service;
     }
 }

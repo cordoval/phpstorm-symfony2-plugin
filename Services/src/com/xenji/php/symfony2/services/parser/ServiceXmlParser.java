@@ -19,8 +19,10 @@ public class ServiceXmlParser extends DefaultHandler {
 
     private VirtualFile file;
 
-    public ServiceXmlParser(VirtualFile file) {
+    private boolean inServices = false;
 
+    public ServiceXmlParser(VirtualFile file) {
+        this.file = file;
     }
 
     @Override
