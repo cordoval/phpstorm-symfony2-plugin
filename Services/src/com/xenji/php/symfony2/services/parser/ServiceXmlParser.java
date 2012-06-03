@@ -6,6 +6,11 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.IOException;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Mario
@@ -21,8 +26,16 @@ public class ServiceXmlParser extends DefaultHandler {
 
     private boolean inServices = false;
 
-    public ServiceXmlParser(VirtualFile file) {
+    private SAXParser parser;
+
+    public ServiceXmlParser(VirtualFile file) throws SAXException, ParserConfigurationException {
         this.file = file;
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        parser = factory.newSAXParser();
+    }
+
+    public void parse() throws IOException, SAXException {
+        parser.parse(file.getInputStream(), this);
     }
 
     @Override
