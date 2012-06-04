@@ -1,8 +1,8 @@
 <idea-plugin version="2">
-  <name>Plugin name here</name>
-  <description>short description of the plugin</description>
+  <name>Symfony2 - Clickable Views</name>
+  <description>Resolves the view from Bundle:Controller:viewname.html.twig</description>
   <version>1.0</version>
-  <vendor>YourCompany</vendor>
+  <vendor>xenji.com</vendor>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
   <idea-version since-build="107.105"/>
@@ -20,6 +20,6 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
+    <psi.referenceContributor>com.xenji.php.symfony2.clickableviews.TwigViewPsiRerferenceContributor</psi.referenceContributor>
   </extensions>
 </idea-plugin>
