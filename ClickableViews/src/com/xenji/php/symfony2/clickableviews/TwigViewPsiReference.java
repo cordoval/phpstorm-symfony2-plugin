@@ -8,6 +8,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.IncorrectOperationException;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.io.IOException;
  */
 public class TwigViewPsiReference implements PsiReference {
 
-    private String templateString;
+    private StringLiteralExpression templateString;
 
     private Project project;
 
@@ -33,7 +34,7 @@ public class TwigViewPsiReference implements PsiReference {
 
     private PsiDirectory viewDir;
 
-    public TwigViewPsiReference(final String templateString, Project project) {
+    public TwigViewPsiReference(final StringLiteralExpression templateString, Project project) {
         this.templateString = templateString;
         this.project = project;
     }
@@ -45,7 +46,7 @@ public class TwigViewPsiReference implements PsiReference {
 
     @Override
     public TextRange getRangeInElement() {
-        return new TextRange(0, this.templateString.length());
+        return this.templateString.getTextRange();
     }
 
     @Override
@@ -56,11 +57,11 @@ public class TwigViewPsiReference implements PsiReference {
             return resolvedFile;
         }
 
-        final String[] pathElements = templateString.split(":");
+        final String[] pathElements = templateString.getText().split(":");
 
         final String base = pathElements[0];
         final String ctrl = pathElements[1];
-        final String viewFileName = pathElements[1];
+        final String viewFileName = pathElements[2];
 
         PsiFile[] filesByName = FilenameIndex.getFilesByName(this.project, pathElements[0] + ".php", GlobalSearchScope.allScope(this.project));
         if (filesByName.length < 1)
@@ -87,7 +88,7 @@ public class TwigViewPsiReference implements PsiReference {
     @NotNull
     @Override
     public String getCanonicalText() {
-        return this.templateString;
+        return this.templateString.getText();
     }
 
     @Override

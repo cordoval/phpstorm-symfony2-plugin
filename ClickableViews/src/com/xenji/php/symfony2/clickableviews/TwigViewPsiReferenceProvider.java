@@ -4,6 +4,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.util.ProcessingContext;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,13 +18,15 @@ public class TwigViewPsiReferenceProvider extends PsiReferenceProvider {
     @NotNull
     @Override
     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-        final String viewLink = element.getText();
+        StringLiteralExpression se = (StringLiteralExpression) element;
+        String text = element.getText();
+        TwigViewPsiReference psiReference = new TwigViewPsiReference(se, element.getProject());
 
-        if (viewLink.contains(".twig") && viewLink.contains(":"))
+        if (psiReference.resolve() != null)
         {
-            return new TwigViewPsiReference[]{new TwigViewPsiReference(element.getText(), element.getProject())};
+            return new PsiReference[]{psiReference};
         }
-        return new TwigViewPsiReference[]{};
+        return PsiReference.EMPTY_ARRAY;
     }
 
 }

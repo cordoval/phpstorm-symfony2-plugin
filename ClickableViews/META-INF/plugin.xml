@@ -1,25 +1,29 @@
 <idea-plugin version="2">
-  <name>Symfony2 - Clickable Views</name>
-  <description>Resolves the view from Bundle:Controller:viewname.html.twig</description>
-  <version>1.0</version>
-  <vendor>xenji.com</vendor>
+    <name>Symfony2 - Clickable Views</name>
+    <description>Resolves the view from Bundle:Controller:viewname.html.twig</description>
+    <version>0.1</version>
+    <vendor email="mario+s2plugin@xenji.com">xenji.com</vendor>
+    <depends>com.jetbrains.php</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
 
-  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="107.105"/>
+    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="107.105"/>
 
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
 
-  <actions>
-    <!-- Add your actions here -->
-  </actions>
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <psi.referenceContributor>com.xenji.php.symfony2.clickableviews.TwigViewPsiRerferenceContributor</psi.referenceContributor>
-  </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <psi.referenceContributor
+                implementation="com.xenji.php.symfony2.clickableviews.TwigViewPsiRerferenceContributor"/>
+    </extensions>
 </idea-plugin>

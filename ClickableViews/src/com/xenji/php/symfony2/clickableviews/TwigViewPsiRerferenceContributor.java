@@ -1,12 +1,9 @@
 package com.xenji.php.symfony2.clickableviews;
 
-import com.intellij.patterns.ElementPattern;
-import com.intellij.patterns.PsiElementPattern;
-import com.intellij.patterns.StandardPatterns;
-import com.intellij.patterns.StringPattern;
-import com.intellij.psi.PsiElement;
+import com.intellij.patterns.*;
 import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,10 +15,12 @@ import com.intellij.psi.PsiReferenceRegistrar;
 public class TwigViewPsiRerferenceContributor extends PsiReferenceContributor {
     @Override
     public void registerReferenceProviders(PsiReferenceRegistrar registrar) {
-        StringPattern stringPattern = StandardPatterns.string();
-        StringPattern finalPattern = stringPattern.contains(":").and(StandardPatterns.string().contains(".twig"));
-        
+        final String regexp = "['\"][\\w]*:[\\w]*:[\\w]+\\.[a-z]+\\.twig[\"']";
+        PsiElementPattern.Capture<StringLiteralExpression> psiElementCapture = PlatformPatterns.psiElement(
+                StringLiteralExpression.class).withText(StandardPatterns.string().matches(regexp));
+        registrar.registerReferenceProvider(
+                psiElementCapture,
+                new TwigViewPsiReferenceProvider(),
+                PsiReferenceRegistrar.DEFAULT_PRIORITY);
     }
-
-
 }
