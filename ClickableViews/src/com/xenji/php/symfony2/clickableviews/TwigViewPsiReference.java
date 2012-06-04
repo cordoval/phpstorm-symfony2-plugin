@@ -7,7 +7,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.ProjectScope;
+import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.util.IncorrectOperationException;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,11 +62,13 @@ public class TwigViewPsiReference implements PsiReference {
 
         final String[] pathElements = templateString.getText().split(":");
 
-        final String base = pathElements[0];
-        final String ctrl = pathElements[1];
-        final String viewFileName = pathElements[2];
+        String base = pathElements[0].replace("\"", "");
+        base = base.replace("'", "");
+        String ctrl = pathElements[1];
+        String viewFileName = pathElements[2].replace("\"", "").replace("'", "");
 
-        PsiFile[] filesByName = FilenameIndex.getFilesByName(this.project, pathElements[0] + ".php", GlobalSearchScope.allScope(this.project));
+        final String filename = base + ".php";
+        PsiFile[] filesByName = FilenameIndex.getFilesByName(project, filename, ProjectScope.getProjectScope(project));
         if (filesByName.length < 1)
         {
             // We cannot resolve properly. Maybe we can guess in some later version.
@@ -72,16 +77,10 @@ public class TwigViewPsiReference implements PsiReference {
         PsiFile bundleFile = filesByName[0];
         this.bundleDir = bundleFile.getContainingDirectory();
 
-        bundleDir.acceptChildren(new PsiElementVisitor() {
-            @Override
-            public void visitFile(PsiFile file) {
-                if (file.getName().equals(viewFileName) && file.getContainingDirectory().getName().equals(ctrl))
-                {
-                    resolvedFile = file;
-                }
-            }
-        });
-
+        PsiDirectory resourcesDir = bundleDir.findSubdirectory("Resources");
+        PsiDirectory viewsDir = resourcesDir.findSubdirectory("views");
+        PsiDirectory ctlDir = viewsDir.findSubdirectory(ctrl);
+        resolvedFile = ctlDir.findFile(viewFileName);
         return resolvedFile;
     }
 
@@ -119,6 +118,6 @@ public class TwigViewPsiReference implements PsiReference {
 
     @Override
     public boolean isSoft() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return true;
     }
 }
