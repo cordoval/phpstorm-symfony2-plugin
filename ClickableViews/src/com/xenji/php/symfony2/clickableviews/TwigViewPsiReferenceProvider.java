@@ -14,8 +14,7 @@ public class TwigViewPsiReferenceProvider extends PsiReferenceProvider {
         StringLiteralExpression se = (StringLiteralExpression) element;
         TwigViewPsiReference psiReference = new TwigViewPsiReference(se, element.getProject());
 
-        if (psiReference.resolve() != null)
-        {
+        if (psiReference.resolve() != null) {
             return new PsiReference[]{psiReference};
         }
         return PsiReference.EMPTY_ARRAY;

@@ -2,7 +2,10 @@ package com.xenji.php.symfony2.clickableviews;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.util.IncorrectOperationException;
@@ -38,8 +41,7 @@ public class TwigViewPsiReference implements PsiReference {
     @Override
     public PsiElement resolve() {
 
-        if (resolvedFile != null)
-        {
+        if (resolvedFile != null) {
             return resolvedFile;
         }
 
@@ -52,8 +54,7 @@ public class TwigViewPsiReference implements PsiReference {
         final String filename = base + ".php";
         PsiFile[] filesByName = FilenameIndex.getFilesByName(project, filename, ProjectScope.getProjectScope(project));
 
-        if (filesByName.length < 1)
-        {
+        if (filesByName.length < 1) {
             // We cannot resolve properly. Maybe we can guess in some later version.
             return null;
         }
@@ -87,8 +88,7 @@ public class TwigViewPsiReference implements PsiReference {
 
     @Override
     public boolean isReferenceTo(PsiElement element) {
-        if (element.getClass().equals(PsiFile.class))
-        {
+        if (element.getClass().equals(PsiFile.class)) {
             PsiFile templateFile = (PsiFile) element;
             // Controller Dir?
             String ctlDir = templateFile.getParent().getName();
