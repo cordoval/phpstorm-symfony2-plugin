@@ -1,28 +1,14 @@
 package com.xenji.php.symfony2.clickableviews;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.impl.DirectoryIndexImpl;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
-import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.util.IncorrectOperationException;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
-/**
- * Created with IntelliJ IDEA.
- * User: mario
- * Date: 04.06.12
- * Time: 08:09
- * To change this template use File | Settings | File Templates.
- */
 public class TwigViewPsiReference implements PsiReference {
 
     private StringLiteralExpression templateString;
@@ -31,20 +17,17 @@ public class TwigViewPsiReference implements PsiReference {
 
     private PsiFile resolvedFile;
 
-    private PsiDirectory bundleDir;
-
-    private PsiDirectory controllerDir;
-
-    private PsiDirectory viewDir;
+    private String cleanString;
 
     public TwigViewPsiReference(final StringLiteralExpression templateString, Project project) {
         this.templateString = templateString;
         this.project = project;
+        cleanString = templateString.getText().replace("\"", "").replace("'", "");
     }
 
     @Override
     public PsiElement getElement() {
-        return resolvedFile;
+        return templateString;
     }
 
     @Override
@@ -60,22 +43,23 @@ public class TwigViewPsiReference implements PsiReference {
             return resolvedFile;
         }
 
-        final String[] pathElements = templateString.getText().split(":");
+        final String[] pathElements = cleanString.split(":");
 
-        String base = pathElements[0].replace("\"", "");
-        base = base.replace("'", "");
+        String base = pathElements[0];
         String ctrl = pathElements[1];
-        String viewFileName = pathElements[2].replace("\"", "").replace("'", "");
+        String viewFileName = pathElements[2];
 
         final String filename = base + ".php";
         PsiFile[] filesByName = FilenameIndex.getFilesByName(project, filename, ProjectScope.getProjectScope(project));
+
         if (filesByName.length < 1)
         {
             // We cannot resolve properly. Maybe we can guess in some later version.
             return null;
         }
+
         PsiFile bundleFile = filesByName[0];
-        this.bundleDir = bundleFile.getContainingDirectory();
+        PsiDirectory bundleDir = bundleFile.getContainingDirectory();
 
         PsiDirectory resourcesDir = bundleDir.findSubdirectory("Resources");
         PsiDirectory viewsDir = resourcesDir.findSubdirectory("views");
@@ -92,28 +76,34 @@ public class TwigViewPsiReference implements PsiReference {
 
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-        try {
-            this.resolvedFile.getVirtualFile().rename(this, newElementName);
-        } catch (IOException e) {
-            throw new IncorrectOperationException(e.getMessage(), e);
-        }
-        return resolvedFile;
+        return templateString;
     }
 
     @Override
     public PsiElement bindToElement(@NotNull PsiElement element) throws IncorrectOperationException {
-        return null;
+        this.resolvedFile = (PsiFile) element;
+        return this.resolvedFile;
     }
 
     @Override
     public boolean isReferenceTo(PsiElement element) {
+        if (element.getClass().equals(PsiFile.class))
+        {
+            PsiFile templateFile = (PsiFile) element;
+            // Controller Dir?
+            String ctlDir = templateFile.getParent().getName();
+            // xyz.html.twig -> Default -> views -> Resources -> AcmeBundle!
+            String bundleDir = templateFile.getParent().getParent().getParent().getParent().getName();
+            StringBuilder sb = new StringBuilder(bundleDir).append(":").append(ctlDir).append(":").append(templateFile.getName());
+            return cleanString.equals(sb.toString());
+        }
         return false;
     }
 
     @NotNull
     @Override
     public Object[] getVariants() {
-        return new Object[0];  //To change body of implemented methods use File | Settings | File Templates.
+        return new Object[0];
     }
 
     @Override
